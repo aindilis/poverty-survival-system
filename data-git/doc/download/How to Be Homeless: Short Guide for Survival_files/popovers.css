@@ -1,0 +1,43 @@
+.easyazon-popover {
+	max-width: 450px;
+}
+
+.easyazon-popover-content {
+	width: 450px;
+}
+
+.easyazon-popover-content:after {
+	clear: both;
+	content: "";
+	display: table;
+}
+
+.easyazon-popover-image-container {
+	float: left;
+	width: 75px;
+}
+
+.easyazon-popover-image {
+	display: block;
+	margin: 0 auto;
+	max-width: 100%;
+	height: auto;
+}
+
+.easyazon-popover-information {
+	margin-left: 87px;
+}
+
+.easyazon-popover-information-title {
+	font-weight: 700;
+	margin: 0 0 1em;
+}
+
+.easyazon-popover-information-button {
+	margin: 1em 0;
+}
+
+.easyazon-popover-information-disclaimer {
+	color: #666666;
+	font-size: 0.8em;
+}

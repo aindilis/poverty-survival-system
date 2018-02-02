@@ -1,0 +1,162 @@
+						// "here document" dump of JS. (no comment on 1st or last echo-END lines) Allows  substitution			
+makeG26_1( 1 );			// Call the function that does everything. (purpose = to keep all JS varibles local.)
+function makeG26_1 ( id ) {	// Define the function that does everything. id is a private JS variable equal to 1.
+
+	var z		= "http://zfacts.com/giz/G26/";				// These are all JS variables in a JS program
+	var GND_URL   = z + "GND.php";
+	var type1URL  = z + "GND_clock1.js";
+	var type2URL  = z + "GND_type2.html";
+	var type3URL  = z + "GND_type3.html";
+	var rLink	= document.getElementById( "zf26_" + id );	// <a> link to replace. Hopefully this can't be to soon to findit.
+	var cID 	= 'G26_1';									// e.g. cID = "G26_1"
+// --------------------------------------------------------------------------------------------- End of Gizmo-specific variable names
+	var j, k;
+
+	var	type,			tickrate,		size,			cents,			width,		height,		titleBold,	debtBold,
+		title,			titleBgClr,		titleColor, 	titleSize,		debtBgClr,	debtColor,	debtSize,	flip,
+		downShift,		borderColor,	infoSize;
+	var user_prams = new Array(
+		"type",			"tickrate",		"cents",		"size",			"width",		"height",		"titleBold",	"debtBold",
+		"title",		"titleBgClr",	"titleColor",	"titleSize",	"debtBgClr",	"debtColor",	"debtSize",		"flip",
+		"downShift",	"borderColor",	"infoSize");
+
+    var uPStr = rLink.getAttribute('rel');						// get user Param string from span title
+    if (uPStr) eval_uPStr(uPStr);     		   			        // Evaluate variables in user parameter string
+
+    type	= setPrmOne( type,		'3',	['1', '2', '3'] );	// 0 = no iframe, 1 = tiny iframe, 2 = standard iframe w/ box
+    tickrate= setPrmRng( tickrate,	 3,		[0.01, 16] );		// clicks/sec
+    cents	= setPrmOne( cents,		'0',	['0', '1'] );		// show cents
+
+    size	= setPrmOne( size,		'M',	['S', 'M', 'L'] );
+	    var dflt;
+		var siz = "SML".indexOf(size);							// siz = 0, 1 or 2.
+		if (type=='2')	dflt = [102, 126, 160][siz];			// Small, Medium, Large
+		if (type=='3')	dflt = [114, 134, 175][siz];
+    width	= setPrmRng( width,	 	dflt,	[50, 500] );	// iFrame width
+		if (type=='2')	dflt = [14, 17, 22][siz];
+		if (type=='3')	dflt = [32, 37, 45][siz];
+    height	= setPrmRng( height,	dflt, 	[10, 125] );		// iFrame height
+
+    title		= setPrmOne( title,			'1', ['1', '2', '3'] );	// 0 = no iframe, 1 = tiny iframe, 2 = standard iframe w/ box
+    titleBgClr	= setPrmOne( titleBgClr,	'#EEE', [] );
+    titleColor	= setPrmOne( titleColor,	'#55F', [] );
+		dflt	= [10, 12, 14][siz];						// Small, Medium, Large
+    titleSize	= setPrmOne( titleSize,	 	dflt,	[] );
+	titleBold	= setPrmOne( titleBold,		0,	[0, 1] );
+
+    debtBgClr 	= setPrmOne( debtBgClr,		'#FFF', [] );
+    debtColor	= setPrmOne( debtColor,		'#900', [] );
+		dflt	= [10, 13, 17][siz];
+    debtSize	= setPrmOne( debtSize,	 	dflt,	[] );
+	debtBold	= setPrmOne( titleBold,		0,	[0, 1] );
+
+	flip		= setPrmOne( flip,			0,		[0, 1] );
+		dflt	= [1, 3, 5][siz];
+	downShift	= setPrmRng( downShift,		dflt,	[-10, 20] );
+    borderColor = setPrmOne( borderColor,	'#000', [] );
+		dflt	= [9, 12, 15][siz];
+	if (info()) return;													// Check for link
+    // ------------------------------------------------------- Cleans User Params, and uppercase them
+    function eval_uPStr(uPStr) {					// Cleans the string, and then evaluates legit variables
+        uPStr = uPStr.replace(/[^;=\w\#\.\/]/g,'');	// Replace Not chars [ a-z A-Z 0-9 ; = # . / ] with nothing => no quotes
+        var p1s = uPStr.split(';');
+        var cleaned = "";
+        var side = [];
+        for (j=0; j<p1s.length; j++) {
+			if (p1s[j].indexOf('//') > -1) continue;		// skip comments.
+        	side = p1s[j].split('=');
+        	for (k=0; k<user_prams.length; k++) {
+				if (side[0].toLowerCase()===user_prams[k].toLowerCase()) {	// If user has set a legit parameter
+					eval(user_prams[k]+'="'+side[1]+'";');					// all values will be stringed. OK because '2.3' == 2.3
+				}
+	  		}
+		}
+    }
+    function setPrmOne( param, dflt, choices ) {			// set discrete choice params. empty choices => any choice OK
+        if (typeof(param)=='undefined')		return dflt;    // The default value
+        if (typeof(choices[0])=='undefined') return param;	// if no alternatives listed accept any pname value		 return eval(pname);                 		
+        for (j=0; j<choices.length; j++)					// check possible values
+            if ( param == choices[j] ) 		return param;	//    If p equals one of them, then leave it alone
+        return dflt;                                		// otherwiser return the default
+    }
+    function setPrmRng( pm, dflt, rg ) {			// Set a parameter that can have a range of values
+        if (typeof(pm)=='undefined')			return dflt;
+		if (rg[0]<=pm && pm<=rg[1]) return pm;
+        if (pm < rg[0])				return rg[0];
+        if (rg[1] < pm)				return rg[1];
+        return dflt;
+    }
+	function info() {										// Check for link
+		var s = rLink.href + rLink.innerHTML;
+		h = 1;	for (j=0; j<s.length; j++) {
+			h = h*s.charCodeAt(j) % 9001 +677;
+		}
+		if (h + 314 == rLink.name) return 0; return 1;
+	}
+//	log(G26_GND);
+// ----------------------------------------------------------------------------------- SET UP GIZMO By type
+
+    if ( type == '1' ) {			// No iFrame, text only
+        // Now we're ready to insert the widget script into the <head>
+        var spn = document.createElement("span");			// span to replace link
+		spn.setAttribute('id', cID);
+		rLink.parentNode.replaceChild(spn, rLink);			// Replace required link with Gizmo <span id>
+
+		if ( typeof(isClk26)=='undefined' ) {
+			isClk26=1;										// Global (not 'var'ed) so the next make-function can check if clock is loaded
+  			var s1 = document.createElement( 'script' );
+    	        s1.setAttribute( "type", "text/javascript" );
+				s1.setAttribute( "src", type1URL );
+        	document.getElementsByTagName("head")[0].appendChild(s1);	// puts Gizmo script for <span id> in html head
+		}
+		var dlay=100;
+    	function waitClk() {						// Wait for s1 with clock1 Object to show up
+			if (typeof(clockObj)=='function') { finish(); return; }
+			if ((dlay = dlay*1.3) > 5000) return;			// give up after about 27 second
+			setTimeout(waitClk,dlay);
+  		}
+		function finish() {
+			var clkG26_1 = new clockObj();
+			clkG26_1.goClock(cID, tickrate, 1, cents);	// 1=> dollar sign			
+		}
+		waitClk();
+		return;
+	}
+
+    uPStr = ""; var x;
+    for (k=0; k<user_prams.length; k++) {
+    	x = user_prams[k];
+    	uPStr += x + '=' + eval(x) + "&"	// Creates parameter string for passing to HTML in iFrame
+    }
+
+    uPStr = uPStr.replace(/\#/g, 'XnX');	// the # in colors causes trouble.
+
+    var iframe;
+    if ( iframe = document.createElement('iframe') ) {	// Build the iFrame and load it for type = 1 or 2
+		if (type=='2') iframe.src = type2URL +'?'+ uPStr;
+		if (type=='3') iframe.src = type3URL +'?'+ uPStr;
+		iframe.id = cID;
+		iframe.frameBorder = "0";
+		iframe.border = "0";
+		iframe.vspace="0";
+		iframe.hspace="0";
+		iframe.marginwidth="0";
+		iframe.marginheight="0";
+		iframe.width = width + "px";
+		iframe.height = height;
+		iframe.scrolling = "no";
+		iframe.style.border = "0";
+		iframe.style.position = "relative";
+		iframe.style.bottom = '-' + downShift + 'px';
+		rLink.parentNode.replaceChild(iframe, rLink);	// Replace Required Link with iFrame that will become the counter
+    }
+
+// ----------------------------------------------------------------------- LOGGER
+	function log() {  
+		var file = 'http://zfacts.com/giz/udat/reco.php?gizName=';		// Path to Logger: rec.php
+		var script = document.createElement('script');						// Start a script
+		script.src = file + '&domain=' +document.domain+ '&location=' +document.location;  // Script to call reco with local info
+		script.type = 'text/javascript'; 
+		document.getElementsByTagName('head').item(0).appendChild(script);	// Puts the JS scrip into document head. It runs.
+	}
+}	// end make
